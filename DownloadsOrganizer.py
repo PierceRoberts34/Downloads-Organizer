@@ -24,28 +24,36 @@ def fileIdentify(downloadsPath,filepath):
     # Define the file type and appropriate subfolder
     match (extension):
 
-        case '.jpg'|'.png'|'.gif'|'.webp':
+        case '.jpg'|'.jpeg'|'.png'|'.gif'|'.webp'|'.bmp'|'.tiff'|'.tif'|'.ico'|'.svg':
             date = time.strftime("%Y-%m-%d", time_obj)
             file = FileType.Photo(filename, extension, date)
             subfolders = f"PHOTOS//{file.get_date()}"
 
-        case '.flac'|'.mp3':
+        case '.flac'|'.mp3'|'.wav'|'.ogg'|'.cda'|'.aif':
             audiotag = eyed3.load(fullpath)
             file = FileType.Music(filename, extension, audiotag.tag.getBestDate(), audiotag.tag.album_artist, audiotag.tag.album)
-            if (file.get_extension() == '.mp3'):
-                type = "MP3"
-            else:
-                type = "FLAC"
-            subfolders = f"MUSIC//{type}//{file.get_albumartist()} - {file.get_album()} ({file.get_year()})"
+            match file.get_extension():
+                case '.mp3':
+                    type = "MP3"
+                case '.flac':
+                    type = "FLAC"
+                case '.wav':
+                    type = "WAV"
+                case '.ogg':
+                    type = "OGG"
+                case '.cda':
+                    type = "CDA"
+                case '.aif':
+                    type = "AIF"
 
-        case '.pdf'|'.xls'|'.xlsx'|'.ods'|'.xlsm'|'.csv'|'.doc'|'.docx'|'.odf'|'.docm'|'.ppt'|'.pptx'|'.pptm'|'.odp':
+        case '.pdf'|'.xls'|'.xlsx'|'.ods'|'.xlsm'|'.csv'|'.doc'|'.docx'|'.odf'|'.docm'|'.txt'|'.ppt'|'.pptx'|'.pptm'|'.odp':
             file = FileType.FileType(filename,extension)
             match file.get_extension():
                 case '.pdf':
                     type = "PDF"
                 case '.xls'|'.xlsx'|'.ods'|'.xlsm'|'.csv':
                     type = "SPREADSHEET"
-                case '.doc'|'.docx'|'.odf'|'.docm':
+                case '.doc'|'.docx'|'.odf'|'.docm'|'.txt':
                     type = "WORD"
                 case '.ppt'|'.pptx'|'.pptm'|'.odp':
                     type = "PRESENTATION"
@@ -57,11 +65,14 @@ def fileIdentify(downloadsPath,filepath):
         case '.torrent':
             subfolders = "TORRENTS"
 
-        case '.zip':
+        case '.zip'|'.7z'|'.rar':
             subfolders = "ARCHIVES"
 
-        case '.exe'| '.msi':
+        case '.exe'| '.msi'|'.bat'|'.jar'|'.apk'|'.py'|'.com'|'.bin':
             subfolders = "PROGRAMS AND INSTALLERS"
+
+        case '.bin'|'.iso'|'.vcd':
+            subfolders = "DISK AND MEDIA"
 
         case _:
             subfolders = "MISC"
